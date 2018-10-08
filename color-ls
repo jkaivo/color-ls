@@ -28,100 +28,6 @@ output=x
 long=0
 trim=1
 
-_colorize () {
-	awk -vwidest=0 -vlong=${long} -vtrim=${trim} -voutput=${output} '
-		function columns_down() {
-			widest++;
-			column = 0;
-			columns = ENVIRON["COLUMNS"];
-			if (columns == 0) {
-				columns = 80;
-			}
-			ncolumns = columns / widest;
-
-			for (i = 1; i <= NR; i++) {
-				# FIXME: this is all jacked up
-				printf("%-*s", widest, all[(row * ncolumns) + (i % ncolumns)]);
-				column += widest;
-				if (column > columns) {
-					printf("\n");
-					column = 0;
-					row++;
-				}
-				i++;
-			}
-
-			if (column != 0) {
-				printf("\n");
-			}
-		}
-
-		function columns_across() {
-			widest++;
-			column = 0;
-			columns = ENVIRON["COLUMNS"];
-			if (columns == 0) {
-				columns = 80;
-			}
-
-			for (i = 1; i <= NR; i++) {
-				printf("%-*s", widest, all[i]);
-				column += widest;
-				if (column > columns) {
-					printf("\n");
-					column = 0;
-				}
-			}
-
-			if (column != 0) {
-				printf("\n");
-			}
-		}
-
-		function long_output() {
-			for (i = 1; i <= NR; i++) {
-				printf("%s\n", file[i]);
-			}
-		}
-
-		function comma_output() {
-			for (i = 1; i <= NR; i++) {
-				printf("%s%s", i == 1 ? "" : ", ", $0 );
-			}
-		}
-
-		{ color=39; }
-		/\/$/ || (long && /^d/) || (long && $0 == $1) { color=34; }
-		/\*$/ || (long && /^-/ && $1 ~ /x/){ color=32; }
-		/\|$/ || (long && /^p/) { color=33; }
-		/@$/ || (long && /^l/) { color=35; }
-
-		{
-			if (trim == 1) {
-				gsub(/[\/\*\|@]$/, "");
-			}
-
-			if (length > widest) {
-				widest = length;
-			}
-
-			file[NR] = "\033[" color "m" $0 "\033\[0m";
-		}
-
-		END {
-			if (output == "-x") {
-				columns_across();
-			} else if (output == "-C") {
-				columns_down();
-			} else if (output == "-m") {
-				commat_output();
-			} else {
-				long_output();
-			}
-		}
-'
-}
-
 while getopts ACFHLRSacdfgiklmnopqrstux1 option
 do
 	case $option in
@@ -139,4 +45,4 @@ fi
 
 # FIXME: the script returns 0 even if ls does not
 # FIXME: always pass -1 when needed, but do it before operands
-ls $dash_F ${1+$@} | _colorize
+ls $dash_F ${1+$@} | awk -vwidest=0 -vlong=${long} -vtrim=${trim} -voutput=${output} -f $(dirname $0)/color-ls.awk
