@@ -28,16 +28,9 @@ output=x
 long=0
 trim=1
 
-_columns_down () {
-	awk -vwidest=0 '
-		{
-			if (length($0) > widest) {
-				widest = length($0);
-			}
-			all[NR] = $0;
-		}
-
-		END {
+_colorize () {
+	awk -vwidest=0 -vlong=${long} -vtrim=${trim} -voutput=${output} '
+		function columns_down() {
 			widest++;
 			column = 0;
 			columns = ENVIRON["COLUMNS"];
@@ -62,19 +55,9 @@ _columns_down () {
 			if (column != 0) {
 				printf("\n");
 			}
-		}'
-}
-
-_columns_across () {
-	awk -vwidest=0 '
-		{
-			if (length($0) > widest) {
-				widest = length($0);
-			}
-			all[NR] = $0;
 		}
 
-		END {
+		function columns_across() {
 			widest++;
 			column = 0;
 			columns = ENVIRON["COLUMNS"];
@@ -96,39 +79,54 @@ _columns_across () {
 			if (column != 0) {
 				printf("\n");
 			}
-		}'
-}
+		}
 
-_commas () {
-	awk -vcomma=0 '
+		function long_output() {
+			i = 1;
+			while (i <= NR) {
+				printf("%s\n", file[i]);
+			i++;
+			}
+		}
+
+		function comma_output() {
+			i = 1;
+			while (i <= NR) {
+				printf("%s%s", i == 1 ? "" : ", ", $0 );
+				i++;
+			}
+		}
+
+		{ color=39; }
+		/\/$/ || (long && /^d/) || (long && $0 == $1) { color=34; }
+		/\*$/ || (long && /^-/ && $1 ~ /x/){ color=32; }
+		/\|$/ || (long && /^p/) { color=33; }
+		/@$/ || (long && /^l/) { color=35; }
+
 		{
-			printf("%s%s", comma == 1 ? ", " : "", $0 );
-			comma = 1;
+			if (trim == 1) {
+				gsub(/[\/\*\|@]$/, "");
+			}
+
+			if (length > widest) {
+				widest = length;
+			}
+
+			file[NR] = "\033[" color "m" $0 "\033\[0m";
 		}
 
 		END {
-			printf("\n");
-		}'
-}
-
-_output () {
-	case $output in
-	C)	_columns_down;;
-	x)	_columns_across;;
-	m)	_commas;;
-	1|l|o|n|g)	cat;;
-	esac
-}
-
-_colorize () {
-	awk -vcolor=0 -vlong=${long} -vtrim=${trim} '
-		{ color[NR]=39; }
-		/\/$/ || (long && /^d/) || (long && $0 == $1) { color[NR]=34; }
-		/\*$/ || (long && /^-/ && $1 ~ /x/){ color[NR]=32; }
-		/\|$/ || (long && /^p/) { color[NR]=33; }
-		/@$/ || (long && /^l/) { color[NR]=35; }
-		{ if (trim == 1) { gsub(/[\/\*\|@]$/, ""); } file[NR] = $0; }
-		END { i = 1; while (i <= NR) { printf("\033\[%sm%s\033\[0m\n", color[i], file[i]); i++; } }'
+			if (output == '-x') {
+				columns_across();
+			} else if (output == '-C') {
+				columns_down();
+			} else if (output == '-m') {
+				commat_output();
+			} else {
+				long_output();
+			}
+		}
+'
 }
 
 while getopts ACFHLRSacdfgiklmnopqrstux1 option
@@ -148,4 +146,4 @@ fi
 
 # FIXME: the script returns 0 even if ls does not
 # FIXME: always pass -1 when needed, but do it before operands
-ls $dash_F ${1+$@} | _colorize | _output
+ls $dash_F ${1+$@} | _colorize
