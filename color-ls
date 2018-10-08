@@ -139,7 +139,7 @@ _remove_symbols () {
 	fi
 }
 
-while getopts ACFHLRSacdfgiklmopqrstux1 option
+while getopts ACFHLRSacdfgiklmnopqrstux1 option
 do
 	case $option in
 	l|o|n|g)	output=${option}; long=1;;
