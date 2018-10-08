@@ -124,8 +124,8 @@ _output () {
 _colorize () {
 	awk -vcolor=0 -vlong=${long} '
 		{ color=39; }
-		/\/$/ || (long && /^d/) { color=34; }
-		/\*$/ { color=32; }
+		/\/$/ || (long && /^d/) || (long && $0 == $1) { color=34; }
+		/\*$/ || (long && /^-/ && $1 ~ /x/){ color=32; }
 		/\|$/ || (long && /^p/) { color=33; }
 		/@$/ || (long && /^l/) { color=35; }
 		long { printf("\033\[%sm%s\033\[0m\n", color, $0); }'
