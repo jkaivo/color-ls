@@ -22,9 +22,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-# TODO: handle recursive stuff
-# TODO: change this back to -C when that is fixed
-
 function columns_down() {
 	widest++;
 	column = 0;
