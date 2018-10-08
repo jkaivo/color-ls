@@ -23,8 +23,8 @@
 # SOFTWARE.
 
 # TODO: handle recursive stuff
-
-output=x	# TODO: change this back to -C when that is fixed
+# TODO: change this back to -C when that is fixed
+output=x
 long=0
 dash_F_specified=
 
@@ -120,7 +120,6 @@ _output () {
 	esac
 }
 
-# TODO: grab first character from long listings
 _colorize () {
 	awk -vcolor=0 -vlong=${long} '
 		{ color=39; }
@@ -155,5 +154,5 @@ if [ ${long} == 0 ]; then
 fi
 
 # FIXME: the script returns 0 even if ls does not
-# FIXME: always pass -1 when $dash_1 is specified, but do it before operands
+# FIXME: always pass -1 when needed, but do it before operands
 ls $dash_F ${1+$@} | _colorize | _remove_symbols | _output
