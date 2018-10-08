@@ -24,7 +24,7 @@
 
 # TODO: handle recursive stuff
 
-output=-x	# TODO: change this back to -C when that is fixed
+output=x	# TODO: change this back to -C when that is fixed
 dash_F_specified=
 need_dash_F=1
 dash_1=
@@ -112,10 +112,10 @@ _commas () {
 
 _output () {
 	case $output in
-	-C)	cat | _columns_down;;
-	-x)	cat | _columns_across;;
-	-m)	cat | _commas;;
-	-1|-g|-l|-n|-o)	cat;;
+	C)	_columns_down;;
+	x)	_columns_across;;
+	m)	_commas;;
+	1|g|l|n|o)	cat;;
 	esac
 }
 
@@ -142,16 +142,11 @@ _remove_symbols () {
 while getopts ACFHLRSacdfgiklmopqrstux1 option
 do
 	case $option in
-	g)	output=-g; dash_1=''; need_dash_F=1'';;
-	l)	output=-l; dash_1=''; need_dash_F=1'';;
-	n)	output=-n; dash_1=''; need_dash_F=1'';;
-	o)	output=-o; dash_1=''; need_dash_F=1'';;
-	1)	output=-1; dash_1='';;
-	C)	output=-C; dash_1=-1; need_dash_F=1'';;
-	m)	output=-m; dash_1=-1; need_dash_F=1'';;
-	x)	output=-x; dash_1=-1; need_dash_F=1'';;
-	F)	dash_F_specified=-F;;
-	?)	;;
+	g|l|n|o)	output=${output}; dash_1=''; need_dash_F=0;;
+	C|m|x)		output=${output}; dash_1=-1; need_dash_F=1;;
+	1)		output=1; dash_1='';;
+	F)		dash_F_specified=-F;;
+	?)		;;
 	esac
 done
 
