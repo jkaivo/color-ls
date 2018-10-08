@@ -26,7 +26,7 @@
 # TODO: change this back to -C when that is fixed
 output=x
 long=0
-dash_F_specified=
+trim=1
 
 _columns_down () {
 	awk -vwidest=0 '
@@ -121,21 +121,14 @@ _output () {
 }
 
 _colorize () {
-	awk -vcolor=0 -vlong=${long} '
-		{ color=39; }
-		/\/$/ || (long && /^d/) || (long && $0 == $1) { color=34; }
-		/\*$/ || (long && /^-/ && $1 ~ /x/){ color=32; }
-		/\|$/ || (long && /^p/) { color=33; }
-		/@$/ || (long && /^l/) { color=35; }
-		{ printf("\033\[%sm%s\033\[0m\n", color, $0); }'
-}
-
-_remove_symbols () {
-	if [ -z "$dash_F_specified" ]; then
-		sed -e 's/[/*@|]\(.\[0m\)$/\1/g;s/@\( -> \)/\1/g'
-	else
-		cat
-	fi
+	awk -vcolor=0 -vlong=${long} -vtrim=${trim} '
+		{ color[NR]=39; }
+		/\/$/ || (long && /^d/) || (long && $0 == $1) { color[NR]=34; }
+		/\*$/ || (long && /^-/ && $1 ~ /x/){ color[NR]=32; }
+		/\|$/ || (long && /^p/) { color[NR]=33; }
+		/@$/ || (long && /^l/) { color[NR]=35; }
+		{ if (trim == 1) { gsub(/[\/\*\|@]$/, ""); } file[NR] = $0; }
+		END { i = 1; while (i <= NR) { printf("\033\[%sm%s\033\[0m\n", color[i], file[i]); i++; } }'
 }
 
 while getopts ACFHLRSacdfgiklmnopqrstux1 option
@@ -144,7 +137,7 @@ do
 	l|o|n|g)	output=${option}; long=1;;
 	C|m|x)		output=${option}; long=0;;
 	1)		output=1;;
-	F)		dash_F_specified=-F;;
+	F)		trim=0;;
 	?)		;;
 	esac
 done
@@ -155,4 +148,4 @@ fi
 
 # FIXME: the script returns 0 even if ls does not
 # FIXME: always pass -1 when needed, but do it before operands
-ls $dash_F ${1+$@} | _colorize | _remove_symbols | _output
+ls $dash_F ${1+$@} | _colorize | _output
