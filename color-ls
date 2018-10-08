@@ -25,8 +25,9 @@
 # TODO: handle recursive stuff
 
 output=-x	# TODO: change this back to -C when that is fixed
-dash_F=-F
-dash_1=''
+dash_F_specified=
+need_dash_F=1
+dash_1=
 
 _columns_down () {
 	awk -vwidest=0 '
@@ -131,8 +132,8 @@ _colorize () {
 }
 
 _remove_symbols () {
-	if [ ! -z "$dash_F" ]; then
-		sed -e 's/[/*@|]\(.\[0m\)$/\1/g'
+	if [ -z "$dash_F_specified" ]; then
+		sed -e 's/[/*@|]\(.\[0m\)$/\1/g;s/@\( -> \)/\1/g'
 	else
 		cat
 	fi
@@ -141,18 +142,23 @@ _remove_symbols () {
 while getopts ACFHLRSacdfgiklmopqrstux1 option
 do
 	case $option in
-	g)	output=-g; dash_1='';;		# long
-	l)	output=-l; dash_1='';;		# long
-	n)	output=-n; dash_1='';;		# long
-	o)	output=-o; dash_1='';;		# long
-	1)	output=-1; dash_1='';;		# 1 per line
-	C)	output=-C; dash_1=-1;;		# columns, sorted down
-	m)	output=-m; dash_1=-1;;		# comma separated stream
-	x)	output=-x; dash_1=-1;;		# columns, sorted across
-	F)	dash_F='';;
+	g)	output=-g; dash_1=''; need_dash_F=1'';;
+	l)	output=-l; dash_1=''; need_dash_F=1'';;
+	n)	output=-n; dash_1=''; need_dash_F=1'';;
+	o)	output=-o; dash_1=''; need_dash_F=1'';;
+	1)	output=-1; dash_1='';;
+	C)	output=-C; dash_1=-1; need_dash_F=1'';;
+	m)	output=-m; dash_1=-1; need_dash_F=1'';;
+	x)	output=-x; dash_1=-1; need_dash_F=1'';;
+	F)	dash_F_specified=-F;;
 	?)	;;
 	esac
 done
 
+if [ ${need_dash_F} == 1 ]; then
+	dash_F=-F
+fi
+
 # FIXME: the script returns 0 even if ls does not
-ls $dash_F ${1+$@} $dash_1 | _colorize | _remove_symbols $dash_F | _output $output
+# FIXME: always pass -1 when $dash_1 is specified, but do it before operands
+ls $dash_F ${1+$@} | _colorize | _remove_symbols | _output
