@@ -1,4 +1,5 @@
 #!/bin/sh
+
 # MIT License
 #
 # Copyright (c) 2018 Jakob Kaivo
@@ -20,6 +21,8 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+
+# TODO: handle recursive stuff
 
 output=-x	# TODO: change this back to -C when that is fixed
 dash_F=-F
@@ -115,13 +118,15 @@ _output () {
 	esac
 }
 
+# TODO: grab first character from long listings
 _colorize () {
 	awk -vcolor=0 '
+		{ color=39; }
 		/\/$/ { color=34; }
 		/\*$/ { color=32; }
 		/\|$/ { color=33; }
 		/@$/ { color=35; }
-		/[^/@*|]$/ { color=39; }
+		/ -> / { color=35; }
 		{ printf("\033\[%sm%s\033\[0m\n", color, $0); }'
 }
 
