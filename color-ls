@@ -116,11 +116,11 @@ _colorize () {
 		}
 
 		END {
-			if (output == '-x') {
+			if (output == "-x") {
 				columns_across();
-			} else if (output == '-C') {
+			} else if (output == "-C") {
 				columns_down();
-			} else if (output == '-m') {
+			} else if (output == "-m") {
 				commat_output();
 			} else {
 				long_output();
