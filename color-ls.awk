@@ -22,6 +22,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+BEGIN {
+	long = 0;
+	widest = 0;
+	if (output == "l" || output == "o" || output == "n" || output == "g") {
+		long = 1;
+	}
+}
+
 function columns_down() {
 	widest++;
 	column = 0;

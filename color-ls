@@ -25,24 +25,19 @@
 # TODO: handle recursive stuff
 # TODO: change this back to -C when that is fixed
 output=x
-long=0
 trim=1
 
 while getopts ACFHLRSacdfgiklmnopqrstux1 option
 do
 	case $option in
-	l|o|n|g)	output=${option}; long=1;;
-	C|m|x)		output=${option}; long=0;;
+	l|o|n|g)	output=${option};;
+	C|m|x)		output=${option};;
 	1)		output=1;;
 	F)		trim=0;;
 	?)		;;
 	esac
 done
 
-if [ ${long} == 0 ]; then
-	dash_F=-F
-fi
-
 # FIXME: the script returns 0 even if ls does not
 # FIXME: always pass -1 when needed, but do it before operands
-ls $dash_F ${1+$@} | awk -vwidest=0 -vlong=${long} -vtrim=${trim} -voutput=${output} -f $(dirname $0)/color-ls.awk
+ls -F ${1+$@} | awk -vtrim=${trim} -voutput=${output} -f $(dirname $0)/color-ls.awk
