@@ -47,7 +47,7 @@ _columns_down () {
 			}
 			ncolumns = columns / widest;
 
-			i = 0;
+			i = 1;
 			while (i < NR) {
 				# FIXME: this is all jacked up
 				printf("%-*s", widest, all[(row * ncolumns) + (i % ncolumns)]);
@@ -83,13 +83,15 @@ _columns_across () {
 				columns = 80;
 			}
 
-			for (i in all) {
+			i = 1;
+			while (i < NR) {
 				printf("%-*s", widest, all[i]);
 				column += widest;
 				if (column > columns) {
 					printf("\n");
 					column = 0;
 				}
+				i++;
 			}
 
 			if (column != 0) {
@@ -142,8 +144,8 @@ _remove_symbols () {
 while getopts ACFHLRSacdfgiklmopqrstux1 option
 do
 	case $option in
-	g|l|n|o)	output=${output}; dash_1=''; need_dash_F=0;;
-	C|m|x)		output=${output}; dash_1=-1; need_dash_F=1;;
+	g|l|n|o)	output=${option}; dash_1=''; need_dash_F=0;;
+	C|m|x)		output=${option}; dash_1=-1; need_dash_F=1;;
 	1)		output=1; dash_1='';;
 	F)		dash_F_specified=-F;;
 	?)		;;
