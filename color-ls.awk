@@ -30,7 +30,7 @@ BEGIN {
 	}
 }
 
-function columns_down() {
+function columns_output() {
 	widest++;
 	column = 0;
 	columns = ENVIRON["COLUMNS"];
@@ -56,7 +56,7 @@ function columns_down() {
 	}
 }
 
-function columns_across() {
+function row_output() {
 	widest++;
 	column = 0;
 	columns = ENVIRON["COLUMNS"];
@@ -65,7 +65,7 @@ function columns_across() {
 	}
 
 	for (i = 1; i <= NR; i++) {
-		printf("%-*s", widest, all[i]);
+		printf("%-*s ", widest, file[i]);
 		column += widest;
 		if (column > columns) {
 			printf("\n");
@@ -86,8 +86,9 @@ function long_output() {
 
 function comma_output() {
 	for (i = 1; i <= NR; i++) {
-		printf("%s%s", i == 1 ? "" : ", ", $0 );
+		printf("%s%s", i == 1 ? "" : ", ", file[i]);
 	}
+	printf("\n");
 }
 
 { color=39; }
@@ -109,12 +110,12 @@ function comma_output() {
 }
 
 END {
-	if (output == "-x") {
-		columns_across();
-	} else if (output == "-C") {
-		columns_down();
-	} else if (output == "-m") {
-		commat_output();
+	if (output == "x") {
+		row_output();
+	} else if (output == "C") {
+		columns_output();
+	} else if (output == "m") {
+		comma_output();
 	} else {
 		long_output();
 	}
