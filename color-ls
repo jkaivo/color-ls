@@ -26,6 +26,7 @@
 output=C
 trim=1
 options=
+one=1
 
 while getopts ACFHLRSacdfgiklmnopqrstux1 option; do
 	case ${option} in
