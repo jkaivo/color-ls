@@ -35,23 +35,18 @@ BEGIN {
 }
 
 function columns_output() {
-	widest++;
-	column = 0;
-	ncolumns = columns / widest;
+	width = widest + 1;		# include a space
+	printfwidth = width + 9;	# account for color escape sequences
+	ncolumns = int(columns / width);
+	nrows = int(NR / ncolumns) + 1;
 
-	for (i = 1; i <= NR; i++) {
-		# FIXME: this is all jacked up
-		printf("%-*s", widest, file[(row * ncolumns) + (i % ncolumns)]);
-		column += widest;
-		if (column > columns) {
-			printf("\n");
-			column = 0;
-			row++;
+	for (row = 0; row < nrows; row++) {
+		for (column = 0; column < ncolumns; column++) {
+			f = (column * nrows) + row + 1;
+			if (f <= NR) {
+				printf("%-*s", printfwidth, file[f]);
+			}
 		}
-		i++;
-	}
-
-	if (column != 0) {
 		printf("\n");
 	}
 }
