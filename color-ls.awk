@@ -61,7 +61,6 @@ function row_output() {
 	printfwidth = width + 9;	# account for color escape sequences
 	column = 0;
 
-	printf("Columns: %d\nWidth: %d\n", columns, width);
 	for (i = 1; i <= NR; i++) {
 		column += width;
 		if (column > columns) {
