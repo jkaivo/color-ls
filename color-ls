@@ -23,10 +23,7 @@
 # SOFTWARE.
 
 # TODO: handle recursive stuff
-output=C
-trim=1
 options=
-one=1
 
 while getopts ACFHLRSacdfgiklmnopqrstux1 option; do
 	case ${option} in
@@ -40,4 +37,4 @@ done
 
 shift $(($OPTIND - 1))
 
-exec ls -${options}F${one} -- ${1+$*} | awk -vtrim=${trim} -voutput=${output} -f $(dirname $0)/color-ls.awk
+exec ls -${options}F${one:-1} -- ${1+$*} | awk -vtrim=${trim:-1} -voutput=${output:-C} -f $(dirname $0)/color-ls.awk
