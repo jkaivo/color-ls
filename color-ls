@@ -29,9 +29,9 @@ options=
 
 while getopts ACFHLRSacdfgiklmnopqrstux1 option; do
 	case ${option} in
-	l|o|n|g)	output=${option};;
-	C|m|x)		output=${option};;
-	1)		output=1;;
+	l|o|n|g)	output=${option}; one=${option};;
+	C|m|x)		output=${option}; one=1;;
+	1)		output=1; one=1;;
 	F)		trim=0;;
 	?)		options=${options}${option};;
 	esac
@@ -39,4 +39,4 @@ done
 
 shift $(($OPTIND - 1))
 
-exec ls -${options}F1 -- ${1+$*} | awk -vtrim=${trim} -voutput=${output} -f $(dirname $0)/color-ls.awk
+exec ls -${options}F${one} -- ${1+$*} | awk -vtrim=${trim} -voutput=${output} -f $(dirname $0)/color-ls.awk
