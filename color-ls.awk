@@ -28,20 +28,20 @@ BEGIN {
 	if (output == "l" || output == "o" || output == "n" || output == "g") {
 		long = 1;
 	}
+	columns = ENVIRON["COLUMNS"];
+	if (columns == 0) {
+		columns = 80;
+	}
 }
 
 function columns_output() {
 	widest++;
 	column = 0;
-	columns = ENVIRON["COLUMNS"];
-	if (columns == 0) {
-		columns = 80;
-	}
 	ncolumns = columns / widest;
 
 	for (i = 1; i <= NR; i++) {
 		# FIXME: this is all jacked up
-		printf("%-*s", widest, all[(row * ncolumns) + (i % ncolumns)]);
+		printf("%-*s", widest, file[(row * ncolumns) + (i % ncolumns)]);
 		column += widest;
 		if (column > columns) {
 			printf("\n");
@@ -57,20 +57,18 @@ function columns_output() {
 }
 
 function row_output() {
-	widest++;
+	width = widest + 1;		# include a space
+	printfwidth = width + 9;	# account for color escape sequences
 	column = 0;
-	columns = ENVIRON["COLUMNS"];
-	if (columns == 0) {
-		columns = 80;
-	}
 
+	printf("Columns: %d\nWidth: %d\n", columns, width);
 	for (i = 1; i <= NR; i++) {
-		printf("%-*s ", widest, file[i]);
-		column += widest;
+		column += width;
 		if (column > columns) {
 			printf("\n");
-			column = 0;
+			column = width;
 		}
+		printf("%-*s", printfwidth, file[i]);
 	}
 
 	if (column != 0) {
