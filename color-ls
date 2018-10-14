@@ -121,7 +121,9 @@ function comma_output() {
 }
 
 END {
-	if (output == "x") {
+	if (NR == 0) {
+		# do nothing
+	} else if (output == "x") {
 		row_output();
 	} else if (output == "C") {
 		columns_output();
